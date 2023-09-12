@@ -169,7 +169,8 @@ class BlockRule:
     def rule1(block):
         node = block.boxs[0]
         if not BlockRule.isTextNode(node) and not BlockRule.hasValidChildNode(node):
-            print('Rule 1 violated')
+            pass
+            # print('Rule 1 violated')
             #question
             #block.parent.children.remove(block)
         return False

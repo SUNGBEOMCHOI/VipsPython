@@ -91,6 +91,15 @@ class Vips:
             i+=1
               
         self.browser.quit()
+    
+    def parse(self):
+        print('-----------------------------Getting Blocks------------------------------------')
+        be = BlockExtraction()
+        be.service(self.url, self.nodeList)
+        blockList = be.blockList
+        self.imgOut.outBlock(blockList, self.fileName, 0)
+        self.browser.quit()
+        return be.grouped_texts
 
     def checkDoc(self, blocks):
         for blockVo in blocks:
@@ -112,10 +121,10 @@ class Vips:
             print ("Invalid address: " + str(urlStr))
       
     def setDriver(self):
-        CHROME_PATH = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"  # chrome path
-        #CHROME_PATH = r"C:\Users\Tarc\AppData\Local\Google\Chrome\Application\chrome.exe"
-        CHROMEDRIVER_PATH = r"C:\chromedriver_win32\chromedriver.exe" # driver path
-        #ADBLOCK_PATH = r"C:\Users\Hard-\AppData\Local\Google\Chrome\User Data\Default\Local Extension Settings\cfhdojbkjhnklbpkdaibdccddilifddb"
+        # CHROME_PATH = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"  # chrome path
+        # #CHROME_PATH = r"C:\Users\Tarc\AppData\Local\Google\Chrome\Application\chrome.exe"
+        # CHROMEDRIVER_PATH = r"C:\chromedriver_win32\chromedriver.exe" # driver path
+        # #ADBLOCK_PATH = r"C:\Users\Hard-\AppData\Local\Google\Chrome\User Data\Default\Local Extension Settings\cfhdojbkjhnklbpkdaibdccddilifddb"
         """
         WIDTH = 1080
         HEIGHT = 1920
@@ -132,8 +141,8 @@ class Vips:
         #chrome_options.add_argument('--disable-popup-blocking')
         #chrome_options.add_argument('load-extention='+ADBLOCK_PATH)
         #chrome_options.add_extension('Adblock-Plus_v3.1.crx')
-        chrome_options.binary_location = CHROME_PATH        
-        self.browser = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+        # chrome_options.binary_location = CHROME_PATH        
+        self.browser = webdriver.Chrome(options=chrome_options)
         
 
     def toDOM(self, obj, parentNode=None):
@@ -179,7 +188,7 @@ class Vips:
         self.browser.get(self.url)       
         #time.sleep(3)
         #read in our DOM js file as string
-        file = open("dom.js", 'r')
+        file = open("./database/chunk/VipsPython/Vips/dom.js", 'r')
         jscript = file.read()
         #add additional javascript code to run our DOM js's toJSON method
         jscript += '\nreturn JSON.stringify(toJSON(document.getElementsByTagName("BODY")[0]));'
