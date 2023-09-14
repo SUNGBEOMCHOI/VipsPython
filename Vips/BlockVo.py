@@ -9,26 +9,22 @@ import BlockRule
 import Vips
 
 class BlockVo:
-    
-    id = None
-    x = 0
-    y = 0
-    width = 0
-    height = 0
-    boxs = []
-    parent = None
-    children = []
-    isVisualBlock = True
-    isDividable = True
-    Doc = 0
     count = 1
-        
+
     def __init__(self):
         self.id = str(BlockVo.count)
         BlockVo.count += 1
         #str(uuid.uuid4())
         self.boxs = []
         self.children = []
+        self.x = 0
+        self.y = 0
+        self.width = 0
+        self.height = 0
+        self.parent = None
+        self.isVisualBlock = True
+        self.isDividable = True
+        self.Doc = 0
     
     def refresh(self):
         for i in range(0, len(self.boxs)):

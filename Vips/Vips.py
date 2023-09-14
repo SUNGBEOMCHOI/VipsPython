@@ -25,79 +25,84 @@ from DomNode import DomNode
 class Vips:
     PDoc = 1
     Round = 1
-    url = None
-    fileName = None
-    browser = None
-    count = 0
-    imgOut = None
-    html = None
-    cssBoxList = dict()
-    nodeList = []
-    count3 = 0
     
     def __init__(self, urlStr):
+        self.fileName = None
+        self.browser = None
+        self.count = 0
+        self.imgOut = None
+        self.html = None
+        self.url = None
+        self.cssBoxList = dict()
+        self.count3 = 0
+        self.nodeList = []
         self.setUrl(urlStr)
         self.setDriver()
         self.imgOut = ImageOut()
-        self.imgOut.outImg(self.browser, self.url, self.fileName)
+        self.img = self.imgOut.outImg(self.browser, self.url, self.fileName, save=False)
         self.getDomTree()
-               
-    def service(self):
-        print('-----------------------------Block Extraction------------------------------------')
-        be = BlockExtraction()
-        block = be.service(self.url, self.nodeList)
-        blockList = be.blockList
-        i = 0
-        while self.checkDoc(blockList) and i<self.Round:
-            print ("blockList.size::", len(blockList))
-            self.imgOut.outBlock(blockList, self.fileName,i)
-            ImageOut.outText(self.fileName, blockList, i)                    
-            print("-----------------------------Separator Detection---------------------------------"+str(i))
-            sd = SeparatorDetection(self.browser.get_window_size()['width'], self.browser.get_window_size()['height'])
-            verticalList = []
-            verticalList.extend(sd.service(blockList, SeparatorVo.TYPE_VERTICAL))
-            self.imgOut.outSeparator(verticalList, self.fileName, '_vertica_', i)
+
+    # Does not work anymore  
+    # def service(self):
+    #     print('-----------------------------Block Extraction------------------------------------')
+    #     be = BlockExtraction()
+    #     block = be.service(self.url, self.nodeList)
+    #     blockList = be.blockList
+    #     i = 0
+    #     while self.checkDoc(blockList) and i<self.Round:
+    #         print ("blockList.size::", len(blockList))
+    #         self.imgOut.outBlock(blockList, self.fileName,i)
+    #         ImageOut.outText(self.fileName, blockList, i)                    
+    #         print("-----------------------------Separator Detection---------------------------------"+str(i))
+    #         sd = SeparatorDetection(self.browser.get_window_size()['width'], self.browser.get_window_size()['height'])
+    #         verticalList = []
+    #         verticalList.extend(sd.service(blockList, SeparatorVo.TYPE_VERTICAL))
+    #         self.imgOut.outSeparator(verticalList, self.fileName, '_vertica_', i)
             
-            horizList = []
-            horizList.extend(sd.service(blockList, SeparatorVo.TYPE_HORIZ))
-            self.imgOut.outSeparator(horizList, self.fileName,'_horizontal_', i)
+    #         horizList = []
+    #         horizList.extend(sd.service(blockList, SeparatorVo.TYPE_HORIZ))
+    #         self.imgOut.outSeparator(horizList, self.fileName,'_horizontal_', i)
             
-            print("-----------------------Setting Weights for Separators----------------------------"+str(i))
-            hrList = be.hrList
-            sw = SeparatorWeight(self.nodeList)
-            sw.service(horizList, hrList)
-            sw.service(verticalList, hrList)
+    #         print("-----------------------Setting Weights for Separators----------------------------"+str(i))
+    #         hrList = be.hrList
+    #         sw = SeparatorWeight(self.nodeList)
+    #         sw.service(horizList, hrList)
+    #         sw.service(verticalList, hrList)
             
-            print("-----------------------Content Structure Construction----------------------------"+str(i))
-            sepList = []
-            sepList.extend(horizList)
-            sepList.extend(verticalList)
-            sepList.sort(key=functools.cmp_to_key(Vips.sepCompare))
-            tempList = blockList
-            csc = ContentStructureConstruction()
-            csc.service(sepList, block)
-            BlockVo.refreshBlock(block)
-            blockList.clear()
-            be.filList(block)
-            blockList = be.blockList
+    #         print("-----------------------Content Structure Construction----------------------------"+str(i))
+    #         sepList = []
+    #         sepList.extend(horizList)
+    #         sepList.extend(verticalList)
+    #         sepList.sort(key=functools.cmp_to_key(Vips.sepCompare))
+    #         tempList = blockList
+    #         csc = ContentStructureConstruction()
+    #         csc.service(sepList, block)
+    #         BlockVo.refreshBlock(block)
+    #         blockList.clear()
+    #         be.filList(block)
+    #         blockList = be.blockList
         
-            for newBlock in blockList:
-                for oldBlock in tempList:
-                    if newBlock.id == oldBlock.id:
-                        blockList.remove(newBlock)
-                        break
+    #         for newBlock in blockList:
+    #             for oldBlock in tempList:
+    #                 if newBlock.id == oldBlock.id:
+    #                     blockList.remove(newBlock)
+    #                     break
             
-            #ImageOut.outText(self.fileName, blockList , 'test')
-            i+=1
+    #         #ImageOut.outText(self.fileName, blockList , 'test')
+    #         i+=1
               
-        self.browser.quit()
+    #     self.browser.quit()
     
+    # use parse instead of service
     def parse(self):
-        print('-----------------------------Getting Blocks------------------------------------')
+        # print('-----------------------------Getting Blocks------------------------------------')
         be = BlockExtraction()
         be.service(self.url, self.nodeList)
         blockList = be.blockList
-        self.imgOut.outBlock(blockList, self.fileName, 0)
+
+        # un comment this if you want to save image
+        self.imgOut.outBlock(blockList, self.fileName, 0, self.img, visualize=True)
+
         self.browser.quit()
         return be.grouped_texts
 

@@ -9,36 +9,34 @@ import BlockVo
 import BlockRule
 
 class BlockExtraction:
-    
-    html = None
-    blockList = []
-    hrList = []
-    cssBoxList = dict()
-    block = None
-    count = 0
-    count1 = 0
-    count2 = 0
-    count3 = 1
     all_text_nodes = []
     max_dist = 7
     max_dist_gap = 4
 
     def __init__(self):
+        self.html = None
+        self.hrList = []
+        self.cssBoxList = dict()
+        self.count = 0
+        self.count1 = 0
+        self.count2 = 0
+        self.count3 = 1
         self.block = BlockVo.BlockVo()
+        self.blockList = []
                 
     def service(self, url, nodeList):
         BlockRule.BlockRule.initialize(nodeList)
         body = nodeList[0]
         self.initBlock(body, self.block)  
-        print("-----Done Initialization-----")
+        # print("-----Done Initialization-----")
         self.count3 = 0
         self.dividBlock(self.block)
-        print(self.count2)       
-        print("-----Done Division-----")
+        # print(self.count2)       
+        # print("-----Done Division-----")
         BlockVo.BlockVo.refreshBlock(self.block)
-        print("-----Done Refreshing-----")
+        # print("-----Done Refreshing-----")
         self.filList(self.block)
-        print("-----Done Filling-----")
+        # print("-----Done Filling-----")
         self.groupBlock()
         #self.checkText()
         return self.block
@@ -105,7 +103,8 @@ class BlockExtraction:
                     group = [block]
                     grouped_texts.append(grouped_text)
                     grouped_text = text_content
-
+        if group:
+            grouped_texts.append(grouped_text)
         self.grouped_texts = grouped_texts
         # for t in grouped_texts:
         #     print(t)

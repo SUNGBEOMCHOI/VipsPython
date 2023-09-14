@@ -7,64 +7,83 @@ Created on Sat Jun 02 20:45:02 2018
 import time
 
 from PIL import Image, ImageDraw, ImageFont
+import io
 
 class ImageOut:
        
-    def outImg(self, browser, url, screenshot_path="screenshot.png"):
-        print('-----------------------------Getting Screenshot------------------------------------')
+    def outImg(self, browser, url, screenshot_path="screenshot.png", save = True):
+        # print('-----------------------------Getting Screenshot------------------------------------')
         default_width=1920
         default_height=1080
         # 1. get dimensions
-        print('getting dimensions...')
+        # print('getting dimensions...')
         browser.set_window_size(default_width, default_height)
         browser.get(url)
-        print('loading...')  
+        # print('loading...')  
         total_height = browser.execute_script("return document.body.parentNode.scrollHeight")
         #self.browser.quit()
     
         # 2. get screenshot
-        print('getting screenshot...')
+        # print('getting screenshot...')
         browser.set_window_size(default_width, total_height)
         browser.get(url)
         #time.sleep(3) 
-        browser.save_screenshot(screenshot_path+'.png')
-        print('done')
+        # browser.save_screenshot(screenshot_path+'.png')
+        screenshot = browser.get_screenshot_as_png()
+        img = Image.open(io.BytesIO(screenshot)).convert('RGB')
+        if save:
+            img.save(screenshot_path+'.png', 'JPEG')
+        # print('done')
+        return img
     
-    def outBlock(self, block, fileName, i=0):
-        print(i)
-        img = Image.open(fileName+'.png')
-        orig_img = Image.open(fileName+'.png')
-        dr = ImageDraw.Draw(img)
+    def outBlock(self, block, fileName, i=0, orig_img = None, visualize = False):
+        # img = Image.open(fileName+'.png')
+        if orig_img is None:
+            orig_img = Image.open(fileName+'.jpeg')
+        width, height = orig_img.size
+
+        img = None
+        dr = None
+        if visualize:
+            img = orig_img.copy()
+            dr = ImageDraw.Draw(img)
+
         for blockVo in block:
-            if blockVo.isVisualBlock:               
-                ################ Rectangle ###################
-                cor = (2 * blockVo.x, 2 * blockVo.y, 2 * (blockVo.x + blockVo.width), 2 * (blockVo.y + blockVo.height))
-                line = (cor[0],cor[1],cor[0],cor[3])
-                dr.line(line, fill="red", width=1)
-                line = (cor[0],cor[1],cor[2],cor[1])
-                dr.line(line, fill="red", width=1)
-                line = (cor[0],cor[3],cor[2],cor[3])
-                dr.line(line, fill="red", width=1)
-                line = (cor[2],cor[1],cor[2],cor[3])
-                dr.line(line, fill="red", width=1)
-                ###############                ####################
-                font = ImageFont.load_default()
-                dr.text((2 * blockVo.x,2 * blockVo.y),blockVo.id,(255,0,0),font=font)
-                #if blockVo.boxs[0].tag != None and blockVo.boxs[0].text != None and not blockVo.boxs[0].text.isspace():
+            if blockVo.isVisualBlock:    
+                cor = (2 * blockVo.x, 2 * blockVo.y, 2 * (blockVo.x + blockVo.width), 2 * (blockVo.y + blockVo.height))   
+                if visualize:        
+                    ############### Rectangle ###################
+                    line = (cor[0],cor[1],cor[0],cor[3])
+                    dr.line(line, fill="red", width=1)
+                    line = (cor[0],cor[1],cor[2],cor[1])
+                    dr.line(line, fill="red", width=1)
+                    line = (cor[0],cor[3],cor[2],cor[3])
+                    dr.line(line, fill="red", width=1)
+                    line = (cor[2],cor[1],cor[2],cor[3])
+                    dr.line(line, fill="red", width=1)
+                    ###############                ####################
+                    font = ImageFont.load_default()
+                    dr.text((2 * blockVo.x,2 * blockVo.y),blockVo.id,(255,0,0),font=font)
+                    #if blockVo.boxs[0].tag != None and blockVo.boxs[0].text != None and not blockVo.boxs[0].text.isspace():
                 flag = False
-                try:
-                    for box in blockVo.boxs:
-                        if box.nodeName == 'img':
-                            flag = True
-                            break
-                    if flag:
-                        cropimg = orig_img.crop(cor)
-                        cropimg.save(fileName + '_img_' + blockVo.id + '.png')
-                except:
-                    print(blockVo.id, 'has not saved')
-                
-        saved_path = fileName + '_Block_' + str(i) + '.png'
-        img.save(saved_path)
+                for box in blockVo.boxs:
+                    if box.nodeName == 'img':
+                        flag = True
+                        break
+                if flag:
+                    if 0 <= cor[0] < width and 0 <= cor[1] < height and 0 <= cor[2] < width and 0 <= cor[3] < height:
+                        if cor[0] != cor[2] and cor[1] != cor[3]:
+                            cropimg = orig_img.crop(cor)
+                            cropimg = cropimg.convert('RGB')
+                            cropimg.save(fileName + '_img_' + blockVo.id + '.jpeg')
+                        # else:
+                            # print(blockVo.id, 'has not saved')
+                    # else:
+                        # print(blockVo.id, 'has not saved')
+
+        if visualize:
+            saved_path = fileName + '_Block_' + str(i) + '.png'
+            img.save(saved_path)
     
     def outSeparator(self, List, fileName, direction, i=0):
         print(i)
