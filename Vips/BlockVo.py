@@ -4,10 +4,6 @@ Created on Tue May 29 12:45:17 2018
 
 @author: Hard-
 """
-import uuid
-import BlockRule
-import Vips
-
 class BlockVo:
     count = 1
 

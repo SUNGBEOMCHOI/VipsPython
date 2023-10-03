@@ -5,8 +5,8 @@ Created on Tue May 29 12:37:05 2018
 @author: Hard-
 """
 import sys
-import BlockVo
-import BlockRule
+from . import BlockVo
+from . import BlockRule
 
 class BlockExtraction:
     all_text_nodes = []

@@ -11,15 +11,15 @@ from urllib.parse import urlparse
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from BlockExtraction import BlockExtraction
-from BlockVo import BlockVo
-from SeparatorDetection import SeparatorDetection
-from SeparatorVo import SeparatorVo
-from SeparatorWeight import SeparatorWeight
-from ContentStructureConstruction import ContentStructureConstruction
-from ImageOut import ImageOut
-from CssBox import CssBox
-from DomNode import DomNode
+from . import BlockExtraction
+# from BlockVo import BlockVo
+# from SeparatorDetection import SeparatorDetection
+# from SeparatorVo import SeparatorVo
+# from SeparatorWeight import SeparatorWeight
+# from ContentStructureConstruction import ContentStructureConstruction
+from . import ImageOut
+# from CssBox import CssBox
+from . import DomNode
 
 
 class Vips:
@@ -38,7 +38,7 @@ class Vips:
         self.nodeList = []
         self.setUrl(urlStr)
         self.setDriver()
-        self.imgOut = ImageOut()
+        self.imgOut = ImageOut.ImageOut()
         self.img = self.imgOut.outImg(self.browser, self.url, self.fileName, save=False)
         self.getDomTree()
 
@@ -96,7 +96,7 @@ class Vips:
     # use parse instead of service
     def parse(self):
         # print('-----------------------------Getting Blocks------------------------------------')
-        be = BlockExtraction()
+        be = BlockExtraction.BlockExtraction()
         be.service(self.url, self.nodeList)
         blockList = be.blockList
 
@@ -156,7 +156,7 @@ class Vips:
         else:
             json_obj = obj
         nodeType = json_obj['nodeType']
-        node = DomNode(nodeType)
+        node = DomNode.DomNode(nodeType)
         if nodeType == 1: #ELEMENT NODE
             node.createElement(json_obj['tagName'])
             attributes = json_obj['attributes']
